@@ -1,39 +1,36 @@
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 export const dynamcParams = true;
 
 export async function generateMetadata({ params }) {
-  const id = params.id;
-  const res = await fetch(`http://localhost:4000/tickets/${id}`);
-  const ticket = await res.json();
+  const supebase = createServerComponentClient({ cookies });
+
+  const { data: ticket } = await supebase
+    .from("tickets")
+    .select()
+    .eq("id", params.id)
+    .single();
 
   return {
-    title: `Dojo Helpdesk | ${ticket.title}`,
+    title: `Dojo Helpdesk | ${ticket?.title || "Ticket not found"}`,
   };
 }
 
-async function generateStaticParams() {
-  const res = await fetch("http://localhost:4000/tickets");
-  const tickets = await res.json();
-
-  return tickets.map((ticket) => ({
-    id: ticket.id,
-  }));
-}
-
 async function getTicket(id) {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
+  const supebase = createServerComponentClient({ cookies });
 
-  const response = await fetch(`http://localhost:4000/tickets/${id}`, {
-    next: {
-      revalidate: 60,
-    },
-  });
+  const { data } = await supebase
+    .from("tickets")
+    .select()
+    .eq("id", id)
+    .single();
 
-  if (!response.ok) {
+  if (!data) {
     notFound();
   }
 
-  return response.json();
+  return data;
 }
 
 export default async function TicketDetails({ params }) {
