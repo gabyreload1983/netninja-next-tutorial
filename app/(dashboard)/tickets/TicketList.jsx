@@ -30,7 +30,7 @@ export default async function TicketList() {
           </Link>
         </div>
       ))}
-      {tickets.lentgh === 0 && (
+      {tickets.length === 0 && (
         <p className="text-center">Ther are no open tickets!</p>
       )}
     </>
