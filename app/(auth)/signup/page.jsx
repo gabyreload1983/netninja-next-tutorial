@@ -17,9 +17,11 @@ export default function Signup() {
       email,
       password,
       options: {
-        emailRedirectTo: `https://netninja-next-tutorial.vercel.app/api/auth/callback`,
+        emailRedirectTo: `${location.origin}/api/auth/callback`,
       },
     });
+
+    console.log(location.origin);
 
     if (error) {
       setError(error.message);
